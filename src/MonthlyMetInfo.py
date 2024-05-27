@@ -1,7 +1,8 @@
+# MonthlyMetInfo.py
+
 from .MGMService import get_request
 from . import tools
 
-from bs4 import BeautifulSoup
 from datetime import datetime
 import locale
 
@@ -33,10 +34,9 @@ class get():
         return self._parse_response(response)       
         
     def _parse_response(self,response): 
-        soup = BeautifulSoup(response.text, 'html.parser')
         try:
-            rows = soup.find_all('tbody')[0].find_all('tr')
-            columns = soup.find_all('thead')[0].find_all('th')
+            rows = response.find_all('tbody')[0].find_all('tr')
+            columns = response.find_all('thead')[0].find_all('th')
         except:
             raise AttributeError('Tablo bulunamadı.')
         

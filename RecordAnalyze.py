@@ -1,3 +1,5 @@
+# RecordAnalyze.py
+
 from src import StationInfo
 from src import DailyMetInfo
 from src import MonthlyMetInfo
@@ -69,7 +71,6 @@ class Monthly(get):
                     print(f"*{province.upper()}* => {value} - {record_temp_value} = {round(value - record_temp_value, 2)} => {record_temp_date}")
             except Exception as e:
                 print(f'Error processing temperature record for {province}: {e}')
-
 
 class Daily(get):
     def __init__(self, day, month, year):

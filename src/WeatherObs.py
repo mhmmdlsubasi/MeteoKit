@@ -6,12 +6,12 @@ from . import tools
 def weather_by_istno(ist_no):
     endpoint = 'sondurumlar'
     params = {'istno': ist_no}
-    return MGMService.get_data(endpoint, params)
+    return MGMService.get_data(endpoint, params)[0]
 
 def weather_by_merkezid(merkezid):
     endpoint = 'sondurumlar'
     params = {'merkezid': merkezid}
-    return MGMService.get_data(endpoint, params)
+    return MGMService.get_data(endpoint, params)[0]
 
 def weather_by_plaka(plaka):
     endpoint = 'sondurumlar/ilTumSondurum'

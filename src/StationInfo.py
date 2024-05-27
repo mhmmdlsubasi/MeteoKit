@@ -12,12 +12,12 @@ def get(province,district):
 
 def all_province_centers():
     endpoint = 'merkezler/iller'
-    return tuple(MGMService.get_data(endpoint))
+    return MGMService.get_data(endpoint)
 
 def all_province_stations(province):
     endpoint = 'istasyonlar/ilAdDetay'
     params = {'il': province.title()}
-    return tuple(MGMService.get_data(endpoint,params))
+    return MGMService.get_data(endpoint,params)
 
 def ski_centers():
     endpoint = 'istasyonlar/kayakMerkezleri'
