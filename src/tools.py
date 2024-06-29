@@ -1,6 +1,7 @@
 # tools.py
 
-def sorter(data,sort_order,value):
+
+def sorter(data, sort_order, value):
     """
     Verilen veri listesini belirli bir değere göre sıralar.
     Args:
@@ -10,15 +11,16 @@ def sorter(data,sort_order,value):
     Returns:
     - sorted_data: Sıralanmış veri listesi.
     """
-    if sort_order == 'ascending':
+    if sort_order == "ascending":
         return tuple(sorted(data, key=lambda x: x[value]))
-    elif sort_order == 'descending':
+    elif sort_order == "descending":
         return tuple(sorted(data, key=lambda x: x[value], reverse=True))
     else:
-        print('WARNING!!!')
+        print("WARNING!!!")
         return tuple(data)
 
+
 def tr_to_eng(text):
-    tr_letters = 'çğıöşüÇĞİÖŞÜ'
-    eng_letters = 'cgiosuCGIOSU'
-    return text.translate(str.maketrans(tr_letters,eng_letters))
+    tr_letters = "çğıöşüÇĞİÖŞÜ"
+    eng_letters = "cgiosuCGIOSU"
+    return text.translate(str.maketrans(tr_letters, eng_letters))
