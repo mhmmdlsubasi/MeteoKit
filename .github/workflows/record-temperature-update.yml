@@ -23,6 +23,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set up locale
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen tr_TR.UTF-8
+          sudo update-locale LANG=tr_TR.UTF-8
+        shell: bash
+
       - name: Run script
         run: |
           python -c "
