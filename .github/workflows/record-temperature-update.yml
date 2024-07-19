@@ -33,15 +33,7 @@ jobs:
 
       - name: Run script
         run: |
-          python -c "
-          import datetime
-          from datetime import timedelta
-          import RecordAnalyze
-
-          today = datetime.datetime.now()
-          day = today - timedelta(days=1)
-          RecordAnalyze.Monthly(day.day, day.month, day.year).maxTemp_to_csv()
-          "
+          python main.py
 
       - name: Move results to directory
         run: |

@@ -4,4 +4,4 @@ import RecordAnalyze
 
 now = datetime.now()
 
-RecordAnalyze.Monthly(now.day, now.month, now.year).maxTemp_to_csv()
+RecordAnalyze.Monthly(now.day-1, now.month, now.year).maxTemp_to_csv()
