@@ -3,8 +3,6 @@ name: Record Max. Temperature Update
 on:
   schedule:
     - cron: '45 18 * * *'
-  push:
-    branches: ["main"]
 
 jobs:
   update-temperature:
