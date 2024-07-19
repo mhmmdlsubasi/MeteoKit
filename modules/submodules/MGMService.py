@@ -13,6 +13,19 @@ import requests
 from bs4 import BeautifulSoup
 from modules.submodules.log import logger
 
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+session = requests.Session()
+retry = Retry(
+    total=5,
+    read=5,
+    connect=5,
+    backoff_factor=0.1
+)
+adapter = HTTPAdapter(max_retries=retry)
+session.mount('http://', adapter)
+session.mount('https://', adapter)
 
 def get_data(endpoint: str, params: dict = None) -> dict:
     """
@@ -33,7 +46,7 @@ def get_data(endpoint: str, params: dict = None) -> dict:
     url = f"{base_url}{endpoint}"
 
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=10)
+        response = session.get(url, headers=headers, params=params, timeout=10)
         response.raise_for_status()  # HTTP hatalarını kontrol et
         logger.info("Başarılı JSON veri alımı: %s", response.url)
         return response.json()
@@ -63,7 +76,7 @@ def get_request(endpoint: str, params: dict = None) -> BeautifulSoup:
     url = f"{base_url}{endpoint}"
 
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = session.get(url, params=params, timeout=10)
         response.raise_for_status()  # HTTP hatalarını kontrol et
         soup = BeautifulSoup(response.text, "html.parser")
         logger.info("Web sayfası alındı: %s", response.url)
