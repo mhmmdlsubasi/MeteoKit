@@ -23,5 +23,5 @@ console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 
 # Logger'a Handler'ları ekle
-# logger.addHandler(console_handler)
+logger.addHandler(console_handler)
 logger.addHandler(file_handler)
