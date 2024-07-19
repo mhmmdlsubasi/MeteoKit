@@ -43,8 +43,11 @@ jobs:
           from datetime import timedelta
           for i in range(10):
               day = today - timedelta(days=i)
-              RecordAnalyze.Monthly(day.day, day.month, day.year).minTemp_to_csv()
-          "
+              try:
+                RecordAnalyze.Monthly(day.day, day.month, day.year).minTemp_to_csv()
+              except:
+                continue
+                "
 
       - name: Move results to directory
         run: |
