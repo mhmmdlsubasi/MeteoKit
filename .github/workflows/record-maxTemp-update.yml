@@ -1,8 +1,8 @@
-name: Record Temperature Update
+name: Record Max. Temperature Update
 
 on:
   schedule:
-    - cron: '0 19 * * *'
+    - cron: '45 18 * * *'
   push:
     branches: ["main"]
 
