@@ -31,6 +31,11 @@ jobs:
           sudo update-locale LANG=tr_TR.UTF-8
         shell: bash
 
+      - name: Set timezone to Turkey
+        run: |
+          sudo timedatectl set-timezone Europe/Istanbul
+        shell: bash
+
       - name: Run script
         run: |
           python -c "
@@ -38,7 +43,6 @@ jobs:
           import RecordAnalyze
 
           today = datetime.datetime.now()
-          print(today)
           RecordAnalyze.Monthly(today.day, today.month, today.year).maxTemp_to_csv()
           "
 

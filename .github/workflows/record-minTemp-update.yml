@@ -29,6 +29,11 @@ jobs:
           sudo update-locale LANG=tr_TR.UTF-8
         shell: bash
 
+      - name: Set timezone to Turkey
+        run: |
+          sudo timedatectl set-timezone Europe/Istanbul
+        shell: bash
+
       - name: Run script
         run: |
           python -c "
