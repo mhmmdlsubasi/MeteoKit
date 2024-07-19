@@ -33,7 +33,19 @@ jobs:
 
       - name: Run script
         run: |
-          python main.py
+          python -c "
+          import datetime
+          from datetime import timedelta
+          import RecordAnalyze
+
+          today = datetime.datetime.now()
+          for i in range(10):
+              day = today - timedelta(days=i)
+              try:
+                RecordAnalyze.Monthly(day.day, day.month, day.year).maxTemp_to_csv()
+              except:
+                continue
+                "
 
       - name: Move results to directory
         run: |
