@@ -1,6 +1,6 @@
 # Radar.py
 
-from .MGMService import get_request
+from .submodules.MGMService import get_request
 from . import tools
 
 _radar_details_cache = None

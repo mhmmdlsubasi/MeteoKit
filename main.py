@@ -1,3 +1,7 @@
-from src import WeatherObs
+from datetime import datetime
 
-WeatherObs.all_province_centers()
+import RecordAnalyze
+
+now = datetime.now()
+
+RecordAnalyze.Monthly(now.day, now.month, now.year).maxTemp_to_csv()

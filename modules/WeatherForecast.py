@@ -1,6 +1,6 @@
 # WeatherForecast.py
 
-from . import MGMService
+from .submodules import MGMService
 
 
 def hourly(saatlikTahminIstNo):

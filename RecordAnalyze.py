@@ -1,9 +1,8 @@
-# RecordAnalyze.py
-
-from src import StationInfo
-from src import DailyMetInfo
-from src import MonthlyMetInfo
+import csv
 from datetime import datetime
+
+from modules import DailyMetInfo, MonthlyMetInfo, StationInfo
+from modules.submodules.log import logger
 
 
 class get:
@@ -36,12 +35,12 @@ class get:
             "lowest_temp" if temp_type == "En Düşük Sıcaklık (°C)" else "highest_temp"
         )
 
-    def _print_date_header(self):
+    def _generate_date_header(self):
         date_str = datetime.strftime(self.daily_weather.date, "%d.%m.%Y")
-        print(f"*{date_str}*")
+        return f"*{date_str}*"
 
-    def _print_separator(self):
-        print("-" * 23)
+    def _generate_separator(self):
+        return "-" * 23
 
 
 class Monthly(get):
@@ -52,8 +51,20 @@ class Monthly(get):
     def minTemp(self):
         return self._temp_control("En Düşük Sıcaklık (°C)")
 
+    def minTemp_to_csv(self):
+        """Aylık minimum sıcaklık verilerini CSV dosyasına kaydeder."""
+        data = self.minTemp()
+        filename = self._generate_filename("minTemp")
+        self.save_to_csv(data, filename)
+
     def maxTemp(self):
         return self._temp_control("En Yüksek Sıcaklık (°C)")
+
+    def maxTemp_to_csv(self):
+        """Aylık maksimum sıcaklık verilerini CSV dosyasına kaydeder."""
+        data = self.maxTemp()
+        filename = self._generate_filename("maxTemp")
+        self.save_to_csv(data, filename)
 
     def _get_record_temp(self, province, temp_type, month_str):
         try:
@@ -61,7 +72,9 @@ class Monthly(get):
             record_temp = monthly_data[temp_type][month_str]
             return record_temp[0], record_temp[1]
         except Exception as e:
-            print(f"Error getting monthly record temperature for {province}: {e}")
+            logger.error(
+                "Error getting monthly record temperature for %s: %s", province, e
+            )
             return None, None
 
     def _temp_control(self, temp_type):
@@ -73,13 +86,19 @@ class Monthly(get):
             filter(lambda x: x["istNo"] in self.istno_tuple, temp_data)
         )
 
-        self._print_date_header()
-        print(f"_*{month_str} Ayı {temp_type} Rekorunu Kıran İller*_")
-        print("_*Tam Liste*_\n")
+        result = {
+            "date": self._generate_date_header(),
+            "title": f"{month_str} Ayı {temp_type} Rekorunu Kıran İller",
+            "list": [],
+        }
 
         for station in center_temp_data:
             province = station["il"]
             value = station["deger"]
+            district = station["ilce"]
+            istNo = station["istNo"]
+            lat = station["enlem"]
+            lon = station["boylam"]
             try:
                 record_temp_value, record_temp_date = self._get_record_temp(
                     province, temp_type, month_str
@@ -92,11 +111,67 @@ class Monthly(get):
                 ) or (
                     temp_type == "En Düşük Sıcaklık (°C)" and value <= record_temp_value
                 ):
-                    print(
-                        f"*{province.upper()}* => {value} - {record_temp_value} = {round(value - record_temp_value, 2)} => {record_temp_date}"
+                    result["list"].append(
+                        {
+                            "province": province.upper(),
+                            "district": district.upper(),
+                            "istNo": istNo,
+                            "lat": lat,
+                            "lon": lon,
+                            "current_temp": value,
+                            "record_temp": record_temp_value,
+                            "difference": round(value - record_temp_value, 2),
+                            "record_date": record_temp_date,
+                        }
                     )
             except Exception as e:
-                print(f"Error processing temperature record for {province}: {e}")
+                logger.error(
+                    "Error processing temperature record for %s: %s", province, e
+                )
+
+        return result
+
+    def save_to_csv(self, data, filename):
+        """Monthly verilerini CSV dosyasına kaydeder."""
+        with open(filename, mode="w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+
+            # Başlık satırı
+            writer.writerow(
+                [
+                    "Province",
+                    "District",
+                    "Station No",
+                    "Latitude",
+                    "Longitude",
+                    "Current Temperature",
+                    "Record Temperature",
+                    "Difference",
+                    "Record Date",
+                ]
+            )
+
+            # Verileri yaz
+            for item in data["list"]:
+                writer.writerow(
+                    [
+                        item["province"],
+                        item["district"],
+                        item["istNo"],
+                        item["lat"],
+                        item["lon"],
+                        item["current_temp"],
+                        item["record_temp"],
+                        item["difference"],
+                        item["record_date"],
+                    ]
+                )
+
+    def _generate_filename(self, temp_type):
+        """CSV dosyasının adını oluşturur."""
+        date_str = datetime.strftime(self.daily_weather.date, "%Y-%m-%d")
+        temp_type_str = "minTemp" if temp_type == "minTemp" else "maxTemp"
+        return f"{date_str}_monthly_{temp_type_str}_record.csv"
 
 
 class Daily(get):
@@ -109,11 +184,26 @@ class Daily(get):
     def maxTemp(self):
         return self._temp_control("En Yüksek Sıcaklık (°C)")
 
+    def minTemp_to_csv(self):
+        """Günlük minimum sıcaklık verilerini CSV dosyasına kaydeder."""
+        data = self.minTemp()
+        filename = self._generate_filename("minTemp")
+        self.save_to_csv(data, filename)
+
+    def maxTemp_to_csv(self):
+        """Günlük maksimum sıcaklık verilerini CSV dosyasına kaydeder."""
+        data = self.maxTemp()
+        filename = self._generate_filename("maxTemp")
+        self.save_to_csv(data, filename)
+
     def _temp_control(self, temp_type):
         temp_method = self._check_temp_type(temp_type)
         temp_data = getattr(self.daily_weather, temp_method)()
-        self._print_date_header()
-        self._print_separator()
+        result = {
+            "date": self._generate_date_header(),
+            "separator": self._generate_separator(),
+            "list": [],
+        }
 
         for station in temp_data:
             if (station["il"] == "Malatya") and (station["ilce"] == "Pötürge"):
@@ -126,12 +216,16 @@ class Daily(get):
                 station["ilce"] = "Ereğli"
             try:
                 c = StationInfo.get(station["il"], station["ilce"])
-            except:
+            except KeyError as e:
+                logger.error("StationInfo.get failed for %s: %s", station["il"], e)
                 continue
             if c["sondurumIstNo"] == station["istNo"]:
                 try:
                     extreme = self.daily_weather.extreme_values(c["merkezId"])
-                except:
+                except ValueError as e:
+                    logger.error(
+                        "Failed to get extreme values for %s: %s", station["il"], e
+                    )
                     continue
                 if (
                     temp_type == "En Yüksek Sıcaklık (°C)"
@@ -140,10 +234,51 @@ class Daily(get):
                     temp_type == "En Düşük Sıcaklık (°C)"
                     and station["deger"] <= extreme["min"]
                 ):
-                    print(f"{station['il']} {station['ilce']} - {station['istAd']}")
-                    print(f"Ölçülen Sıcaklık: {station['deger']}")
-                    if temp_type == "En Yüksek Sıcaklık (°C)":
-                        print(f"Uç Sıcaklık: {extreme['max']}")
-                    else:
-                        print(f"Uç Sıcaklık: {extreme['min']}")
-                    self._print_separator()
+                    result["list"].append(
+                        {
+                            "province": station["il"],
+                            "district": station["ilce"],
+                            "station_name": station["istAd"],
+                            "measured_temp": station["deger"],
+                            "extreme_temp": (
+                                extreme["max"]
+                                if temp_type == "En Yüksek Sıcaklık (°C)"
+                                else extreme["min"]
+                            ),
+                        }
+                    )
+        return result
+
+    def save_to_csv(self, data, filename):
+        """Günlük verileri CSV dosyasına kaydeder."""
+        with open(filename, mode="w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+
+            # Başlık satırı
+            writer.writerow(
+                [
+                    "Province",
+                    "District",
+                    "Station Name",
+                    "Measured Temperature",
+                    "Extreme Temperature",
+                ]
+            )
+
+            # Verileri yaz
+            for item in data["list"]:
+                writer.writerow(
+                    [
+                        item["province"],
+                        item["district"],
+                        item["station_name"],
+                        item["measured_temp"],
+                        item["extreme_temp"],
+                    ]
+                )
+
+    def _generate_filename(self, temp_type):
+        """CSV dosyasının adını oluşturur."""
+        date_str = datetime.strftime(self.daily_weather.date, "%Y-%m-%d")
+        temp_type_str = "minTemp" if temp_type == "minTemp" else "maxTemp"
+        return f"{date_str}_daily_{temp_type_str}.csv"

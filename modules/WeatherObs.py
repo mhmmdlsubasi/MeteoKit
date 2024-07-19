@@ -1,6 +1,6 @@
 # WeatherObs.py
 
-from . import MGMService
+from .submodules import MGMService
 from . import tools
 
 

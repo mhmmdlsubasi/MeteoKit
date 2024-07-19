@@ -1,6 +1,6 @@
 import folium
 from folium.plugins import MarkerCluster, Fullscreen, MeasureControl
-from src import StationInfo
+from modules import StationInfo
 
 opentopomap_url = "https://tile.opentopomap.org/{z}/{x}/{y}.png"
 opentopomap_attr = "OpenTopoMap (https://opentopomap.org/)"
