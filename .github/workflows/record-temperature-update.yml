@@ -44,7 +44,7 @@ jobs:
               try:
                 RecordAnalyze.Monthly(day.day, day.month, day.year).maxTemp_to_csv()
               except:
-                print("{day} gününe ait veri yok.")
+                print(f"{day} gününe ait veri yok.")
           "
 
       - name: Move results to directory
