@@ -3,8 +3,6 @@ name: Record Max. Temperature Update
 on:
   schedule:
     - cron: '45 18 * * *'
-  push:
-    branches: ["main"]
 
 jobs:
   update-temperature:
@@ -38,6 +36,7 @@ jobs:
           import RecordAnalyze
 
           today = datetime.datetime.now()
+          print(today)
           RecordAnalyze.Monthly(today.day, today.month, today.year).maxTemp_to_csv()
           "
 

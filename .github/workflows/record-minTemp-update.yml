@@ -3,8 +3,6 @@ name: Record Min. Temperature Update
 on:
   schedule:
     - cron: '45 06 * * *'
-  push:
-    branches: ["main"]
 
 jobs:
   update-temperature:
